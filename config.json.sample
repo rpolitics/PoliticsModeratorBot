@@ -1,35 +1,43 @@
-{	
+{
 	"slack_token" : "",
 	"bot_name" : "",
 	"subreddit" : "",
 	"user_agent" : "",
+	"log_channel" : "",
 	"report_channel" : "",
+	"database" : {
+		"database" : "",
+		"user" : "",
+		"password" : "",
+		"host" : "",
+		"port" : 
+	},
 	"megabot" : {
 		"mega_flair" : "",
 		"discussion_flair" : ""
+	},
+	"perspective" : {
+		"api_key" : "",
+		"attributes" : []
+	},
+	"postsmailer" : {
+		"timelimit" : ,
+		"subreddits" : []
 	},
 	"reporter" : {
 		"submission_threshold" : ,
 		"comment_threshold" : 
 	},
-	"ratelimit" : {
-		"burst_seconds" : ,
+	"queueflood" : {
+		"burst_max_seconds" :,
 		"daily_seconds" : ,
-		"daily_count" : ,
-		"flair" : "",
-		"reason" : ""
+		"daily_count_limit" : ,
+		"flair" : ""
 	},
 	"removals" : {
-		"database" : "",
-		"subreddit" : "",
-		"user_agent" : "",
-		"mods" : [
-				""
-		],
+		"exemptmods" : [],
 		"header" : "",
 		"footer" : "",
-		"reasons" : {
-				"flair_text_here" : "reason_text_here"
-		}
+		"reasons" : {}
 	}
 }
