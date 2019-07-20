@@ -133,8 +133,8 @@ def cmd_initiate_discussion(args, channel):
 
 def cmd_end_thread(args, channel):
 	ts = pendulum.now().to_datetime_string()
-	response = "Ending thread..."
-	reply(channel, response)
+	text = "Ending thread..."
+	response = reply(channel, text)
 	
 	am_configured = False
 
@@ -164,7 +164,7 @@ def cmd_end_thread(args, channel):
 
 	try:
 		am = subreddit.wiki['config/automoderator']
-		regex = r"^—[\n\r]+[\S ]+[\n\r]+[\S ]+[\n\r]+[\S ]+[\n\r]+[\S ]+megathread{}[\n\r]+".format(post_id)
+		regex = r"^---[\n\r]+[\S ]+[\n\r]+[\S ]+[\n\r]+[\S ]+[\n\r]+[\S ]+megathread{}[\n\r]+".format(post_id)
 		regex = re.compile(regex, re.IGNORECASE|re.MULTILINE)
 
 		conf, reps = re.subn(regex, '', am.content_md)
@@ -176,6 +176,7 @@ def cmd_end_thread(args, channel):
 		log('exception', e)
 		am_configured = False
 
-	response = "Thread *{}* ended. / ID: `{}` / AM Unconfigured: {} / Unsticked: {}".format(title, post_id, am_configured, unsticked)
+	text = "Thread *{}* ended.\nID: `{}`\nAM Unconfigured: {}\nUnsticked: {}".format(title, post_id, am_configured, unsticked)
 	log('info', response)
+	update(channel, text, response['ts')
 	return response
