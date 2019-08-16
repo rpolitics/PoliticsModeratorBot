@@ -44,7 +44,7 @@ def monitor_reports():
 					post_id = get_id(item.link_id)
 					out = "*[REPORTS]* {} by <https://reddit.com/user/{}/overview|/u/{}> has *{}*/{} reports: https://www.reddit.com/r/{}/comments/{}/-/{}/".format(item_type, item.author, item.author, item.num_reports, threshold, config['subreddit'], post_id, item.id)
 				reply(config['report_channel'], out)
-				log('info', out)
+				# log('info', out)
 
 def start():
 	while True:

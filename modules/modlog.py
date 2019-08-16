@@ -38,6 +38,11 @@ def process_modlog():
 			db.Submission.update(flair=flair).where(db.Submission.id==id).execute()
 			removals.process_flair(id, modlog._mod)
 
+		if modlog.mod in config['reporter']['moderators']:
+			out = "*[MODERATOR]* Action *{}* performed by *{}* on *<https://reddit.com/user/{}/overview|/u/{}>*: https://reddit.com{}".format(modlog.action, modlog.mod, modlog.target_author, modlog.target_author, modlog.target_permalink)
+			reply(config['report_channel'], out)
+			# log('info', out)
+
 def start():
 	while True:
 		try:

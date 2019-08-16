@@ -12,13 +12,17 @@
 		"host" : "",
 		"port" : 
 	},
+	"domain_match" : {
+		"ignore" : []
+	},
 	"megabot" : {
 		"mega_flair" : "",
 		"discussion_flair" : ""
 	},
 	"perspective" : {
 		"api_key" : "",
-		"attributes" : []
+		"channel" : "",
+		"attributes" : {}
 	},
 	"postsmailer" : {
 		"timelimit" : ,
@@ -26,10 +30,11 @@
 	},
 	"reporter" : {
 		"submission_threshold" : ,
-		"comment_threshold" : 
+		"comment_threshold" : ,
+		"moderators" : []
 	},
 	"queueflood" : {
-		"burst_max_seconds" :,
+		"burst_max_seconds" : ,
 		"daily_seconds" : ,
 		"daily_count_limit" : ,
 		"flair" : ""

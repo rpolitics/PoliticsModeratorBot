@@ -105,9 +105,9 @@ def cmd_initiate_mega(args, channel):
 	except Exception as e:
 		log('exception', e)
 		reported = False
-	
+
 	text = "Megathread *{}* initiated.\nID: `{}`\nAM Configured: {}\nPosts reported: {}\nReport code: `megathread{}`\nLink: https://reddit.com{}".format(title, post.id, am_configured, reported, post.id, post.permalink)
-	log('info', text)
+	# log('info', text)
 	update(channel, text, response['ts'])
 	return True
 
@@ -127,7 +127,7 @@ def cmd_initiate_discussion(args, channel):
 		return "Unable to create discussion thread. Aborting."
 
 	text = "Discussion thread *{}* initiated.\nID: `{}`\nLink: https://reddit.com{}".format(title, post.id, post.permalink)
-	log('info', response)
+	# log('info', response)
 	update(channel, text, response['ts'])
 	return True
 
@@ -135,7 +135,7 @@ def cmd_end_thread(args, channel):
 	ts = pendulum.now().to_datetime_string()
 	text = "Ending thread..."
 	response = reply(channel, text)
-	
+
 	am_configured = False
 
 	try:
@@ -176,7 +176,8 @@ def cmd_end_thread(args, channel):
 		log('exception', e)
 		am_configured = False
 
-	text = "Thread *{}* ended.\nID: `{}`\nAM Unconfigured: {}\nUnsticked: {}".format(title, post_id, am_configured, unsticked)
-	log('info', response)
-	update(channel, text, response['ts')
-	return response
+	text = "Thread *{}* ended. / ID: `{}`\nAM Unconfigured: {}\nUnsticked: {}".format(title, post_id, am_configured, unsticked)
+	# log('info', response)
+	update(channel, text, response['ts'])
+	return True
+
