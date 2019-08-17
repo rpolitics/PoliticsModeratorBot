@@ -3,7 +3,11 @@
 	"bot_name" : "",
 	"subreddit" : "",
 	"user_agent" : "",
-	"log_channel" : "",
+	"logging" : {
+		"level" : "",
+		"channel" : "",
+		"file" : ""
+	},
 	"report_channel" : "",
 	"database" : {
 		"database" : "",

@@ -31,7 +31,6 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s",
     datefmt='%Y-%m-%d %H:%M:%S',
     handlers=[
-        logging.FileHandler("pmb.log"),
         logging.StreamHandler(stream=log_stream)
     ])
 
@@ -66,6 +65,11 @@ def update(channel, response, ts):
 	return slack_client.api_call("chat.update", channel=channel, text=response, ts=ts)
 
 def log(level, msg):
+	try:
+		clevel = config['logging']['level']
+	except:
+		return
+
 	if level == "info":
 		logging.info(msg)
 	elif level == "warn":
@@ -75,10 +79,18 @@ def log(level, msg):
 
 	try:
 		line = log_stream.getvalue().splitlines()[-1]
-		print(line)
-		reply(config['log_channel'], line)
 	except IndexError:
-		pass
+		return
+
+	if (level == "info" and clevel == "info") or (level == "warn" and (clevel == "warn" or clevel == "info")) or (level == "exception" and clevel):
+		print(line)
+
+		if config['logging']['channel']:
+			reply(config['logging']['channel'], line)
+
+		if config['logging']['file']:
+			with open(config['logging']['file'], 'a+') as f:
+				f.write(line)
 
 def get_args(message_text):
 	args = {}
@@ -89,9 +101,9 @@ def get_args(message_text):
 		if v.startswith('"') and v.endswith('"'):
 			v = v[1:-1]
 		args[k] = v
-		
+
 	return args
-	
+
 def strip_slack_formatting(body):
 	url_regex = r'<https?:\/\/.*(?<=\|)(.*?)(?=\>)'
 	matches = re.findall(url_regex, body)
@@ -153,7 +165,7 @@ def handle_command(command, message_text, channel):
 		response = cmd_help()
 	else:
 		response = "Invalid command. Try again."
-	
+
 	if response:
 		if response != True:
 			reply(channel, response)
