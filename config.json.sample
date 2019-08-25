@@ -26,7 +26,8 @@
 	"perspective" : {
 		"api_key" : "",
 		"channel" : "",
-		"attributes" : {}
+		"remove" : {},
+		"report" : {}
 	},
 	"postsmailer" : {
 		"timelimit" : ,

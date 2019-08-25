@@ -14,6 +14,19 @@ class BaseModel(Model):
 	class Meta:
 		database = mysql_db
 
+
+class BotLog(BaseModel):
+	class Meta:
+		 table_name = 'botlog'
+
+	id = CharField(max_length=10, null=False)
+	module = CharField(max_length=15, null=False)
+	created_utc = DateTimeField(null=False)
+	action = CharField(max_length=50, null=False)
+	details = CharField(max_length=300, null=False)
+	author = CharField(max_length=20, null=False)
+	body = CharField(max_length=10000, null=False)
+
 class Comment(BaseModel):
 	class Meta:
 		table_name = 'comments'
@@ -22,7 +35,7 @@ class Comment(BaseModel):
 	submission_id = CharField(max_length=6, null=False)
 	created_utc = DateTimeField(null=False)
 	author = CharField(max_length=20, null=False)
-	comment = CharField(max_length=10000, null=False)
+	body = CharField(max_length=10000, null=False)
 	author_created_utc = DateTimeField(null=False)
 	author_flair_text = CharField(max_length=64, null=True)
 	author_link_karma = IntegerField(null=False)
@@ -34,7 +47,7 @@ class ModAction(BaseModel):
 		table_name = 'modlog'
 
 	id = CharField(max_length=50, primary_key=True)
-	created_utc= DateTimeField(null=False)
+	created_utc = DateTimeField(null=False)
 	moderator = CharField(max_length=20, null=False)
 	action = CharField(max_length=50, null=False)
 	details = CharField(max_length=300, null=True)
@@ -46,23 +59,11 @@ class Perspective(BaseModel):
 	class Meta:
 		table_name = 'perspective'
 
-	id = CharField(max_length=7, primary_key=True)
-	attack_on_author = FloatField(null=False)
-	attack_on_commenter = FloatField(null=False)
-	flirtation = FloatField(null=False)
-	identity_attack = FloatField(null=False)
-	incoherent = FloatField(null=False)
-	inflammatory = FloatField(null=False)
-	insult = FloatField(null=False)
-	likely_to_reject = FloatField(null=False)
-	obscene = FloatField(null=False)
-	profanity = FloatField(null=False)
-	severe_toxicity = FloatField(null=False)
-	sexually_explicit = FloatField(null=False)
-	spam = FloatField(null=False)
-	threat = FloatField(null=False)
-	toxicity = FloatField(null=False)
-	unsubstantial = FloatField(null=False)
+	id = CharField(max_length=10, primary_key=True)
+	created_utc = DateTimeField(null=False)
+	author = CharField(max_length=20, null=False)
+	scores = TextField(null=False)
+	body = CharField(max_length=10000, null=False)
 
 class Removal(BaseModel):
 	class Meta:
@@ -70,7 +71,7 @@ class Removal(BaseModel):
 
 	submission_id = CharField(max_length=6, null=False)
 	comment_id = CharField(max_length=7, null=False)
-	created_utc= DateTimeField(null=False)
+	created_utc = DateTimeField(null=False)
 	moderator = CharField(max_length=20, null=False)
 	flair = CharField(max_length=64, null=True)
 	is_active = BooleanField(null=False)
