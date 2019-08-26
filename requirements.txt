@@ -1,0 +1,14 @@
+distro
+google-api-python-client
+peewee
+pendulum
+praw
+prettytable
+psutil
+publicsuffixlist
+pymysql
+py-cpuinfo
+requests
+schedule
+slackclient==1.3.1
+
