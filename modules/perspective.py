@@ -30,7 +30,7 @@ def get_scores(comment):
 			scores[attr] = score
 		all_scores[attr] = score
 
-	for attr, treshold in config['perspective']['remove'].items():
+	for attr, threshold in config['perspective']['remove'].items():
 		score = float(attributeScores[attr]['summaryScore']['value'])
 		if score >= threshold:
 			dt = pendulum.now('UTC').to_datetime_string()
@@ -39,7 +39,7 @@ def get_scores(comment):
 
 			db.BotLog.insert(id=target_fullname, module='perspective', created_utc=dt, action='removecomment', details=reason, author=comment.author, body=comment.body).execute()
 
-			# comment.mod.remove()
+			comment.mod.remove()
 
 	return scores, all_scores
 
@@ -53,6 +53,9 @@ def process_comment(comment):
 		return
 
 	if not scores:
+		return
+
+	if not config['perspective']['report']:
 		return
 
 	score_text = []
