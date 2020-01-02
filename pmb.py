@@ -27,7 +27,7 @@ UPTIME = datetime.datetime.now()
 
 log_stream = StringIO()
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.WARNING,
     format="%(asctime)s [%(levelname)s] %(message)s",
     datefmt='%Y-%m-%d %H:%M:%S',
     handlers=[
@@ -76,6 +76,8 @@ def log(level, msg):
 		logging.warning(msg)
 	elif level == "exception":
 		logging.exception(msg)
+
+	logging.exception('\n')
 
 	try:
 		line = log_stream.getvalue().splitlines()[-1]
@@ -163,6 +165,8 @@ def handle_command(command, message_text, channel):
 		response = sysinfo.cmd_get_sysinfo(UPTIME)
 	elif command == 'help':
 		response = cmd_help()
+	elif command == 'test':
+		response = megabot.test(args)
 	else:
 		response = "Invalid command. Try again."
 

@@ -8,6 +8,7 @@
 		"channel" : "",
 		"file" : ""
 	},
+	"announce_channel" : "",
 	"report_channel" : "",
 	"database" : {
 		"database" : "",
@@ -20,6 +21,7 @@
 		"ignore" : []
 	},
 	"megabot" : {
+		"expire" : ,
 		"mega_flair" : "",
 		"discussion_flair" : ""
 	},

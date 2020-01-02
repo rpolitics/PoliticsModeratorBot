@@ -25,7 +25,7 @@ def create_post(channel, title, body, type):
 	response = update(channel, "Stickying post...", response['ts'])
 	post.mod.sticky(state=True)
 	response = update(channel, "Setting suggested sort...", response['ts'])
-	post.mod.suggested_sort(sort='new')
+	post.mod.suggested_sort(sort=config['megabot']['initial_sort'])
 	response = update(channel, "Ignoring reports...", response['ts'])
 	post.mod.ignore_reports()
 
@@ -44,6 +44,11 @@ action_reason: megathread{}""".format(title, post.id, anchor, multi, post.id)
 	am.edit(conf, reason=reason)
 	return True
 
+def change_sort(post, sort, channel):
+	post.mod.suggested_sort(sort=sort)
+	text = "Sort on post *{}* changed to *{}*.".format(post.title, sort)
+	reply(channel, text)
+
 def report_posts(post, limit, anchor, multi, channel, response):
 	regex = r'(?=.*\b{}\b)(?=.*({}))'.format(anchor, multi)
 	count = 1
@@ -57,6 +62,58 @@ def report_posts(post, limit, anchor, multi, channel, response):
 		count += 1
 
 	return True, response
+
+def cmd_end_thread(args, channel):
+	ts = pendulum.now().to_datetime_string()
+
+	am_configured = False
+
+	try:
+		post_id = args['id']
+	except Exception as e:
+		log('warn', e)
+		return "Post `id` not given."
+
+	text = "Ending thread *{}*...".format(post_id)
+	response = reply(channel, text)
+
+	try:
+		post = reddit.submission(post_id)
+		title = post.title
+		sub = post.subreddit
+	except Exception as e:
+		log('warn', e)
+		return "Invalid post `id` given."
+
+	if not sub == config['subreddit']:
+		return "Post <https://redd.it/{}|{}> does not belong to <https://reddit.com/r/{}|/r/{}>".format(post_id, post_id, config['subreddit'], config['subreddit'])
+
+	try:
+		post.mod.sticky(state=False)
+		unsticked = True
+	except Exception as e:
+		log('exception', e)
+		unsticked = False
+
+	try:
+		am = subreddit.wiki['config/automoderator']
+		regex = r"^---[\n\r]+[\S ]+[\n\r]+[\S ]+[\n\r]+[\S ]+[\n\r]+[\S ]+megathread{}[\n\r]+".format(post_id)
+		regex = re.compile(regex, re.IGNORECASE|re.MULTILINE)
+
+		conf, reps = re.subn(regex, '', am.content_md)
+		reason = "End Megathread: {}".format(post_id)
+		am.edit(conf, reason=reason)
+		if reps > 0:
+			am_configured = True
+	except Exception as e:
+		log('exception', e)
+		am_configured = False
+
+	text = "Thread *{}* ended.\nID: `{}`\nAM Unconfigured: {}\nUnsticked: {}".format(title, post_id, am_configured, unsticked)
+	# log('info', response)
+#	update(channel, text, response['ts'])
+	reply(channel, text)
+	return True
 
 def cmd_initiate_mega(args, channel):
 	am_configured = False
@@ -106,9 +163,13 @@ def cmd_initiate_mega(args, channel):
 		log('exception', e)
 		reported = False
 
-	text = "Megathread *{}* initiated.\nID: `{}`\nAM Configured: {}\nPosts reported: {}\nReport code: `megathread{}`\nLink: https://reddit.com{}".format(title, post.id, am_configured, reported, post.id, post.permalink)
+	text = "Megathread *{}* initiated.\nID: `{}`\nAM Configured: {}\nPosts reported: {}\nReport code: `megathread{}`\nLink: https://reddit.com{}\nExpiration: {} seconds\nSort: \"{}\" will be changed to \"{}\" after {} seconds".format(title, post.id, am_configured, reported, post.id, post.permalink, config['megabot']['expire'], config['megabot']['initial_sort'], config['megabot']['final_sort'], config['megabot']['sort_delay'])
 	# log('info', text)
 	update(channel, text, response['ts'])
+
+	t1 = threading.Timer(config['megabot']['expire'], cmd_end_thread, args=[{"id" : post.id}, config['announce_channel']]).start()
+	t2 = threading.Timer(config['megabot']['sort_delay'], change_sort, args=[post, config['megabot']['final_sort'], config['announce_channel']]).start()
+
 	return True
 
 def cmd_initiate_discussion(args, channel):
@@ -126,58 +187,15 @@ def cmd_initiate_discussion(args, channel):
 		log('exception', e)
 		return "Unable to create discussion thread. Aborting."
 
-	text = "Discussion thread *{}* initiated.\nID: `{}`\nLink: https://reddit.com{}".format(title, post.id, post.permalink)
+	text = "Discussion thread *{}* initiated.\nID: `{}`\nLink: https://reddit.com{}\nExpiration: {} seconds".format(title, post.id, post.permalink, config['megabot']['expire'])
 	# log('info', response)
 	update(channel, text, response['ts'])
+
+	t1 = threading.Timer(config['megabot']['expire'], cmd_end_thread, args=[{"id" : post.id}, config['announce_channel']]).start()
+
 	return True
 
-def cmd_end_thread(args, channel):
-	ts = pendulum.now().to_datetime_string()
-	text = "Ending thread..."
-	response = reply(channel, text)
-
-	am_configured = False
-
-	try:
-		post_id = args['id']
-	except Exception as e:
-		log('warn', e)
-		return "Post `id` not given."
-
-	try:
-		post = reddit.submission(post_id)
-		title = post.title
-		sub = post.subreddit
-	except Exception as e:
-		log('warn', e)
-		return "Invalid post `id` given."
-
-	if not sub == config['subreddit']:
-		return "Post <https://redd.it/{}|{}> does not belong to <https://reddit.com/r/{}|/r/{}>".format(post_id, post_id, config['subreddit'], config['subreddit'])
-
-	try:
-		post.mod.sticky(state=False)
-		unsticked = True
-	except Exception as e:
-		log('exception', e)
-		unsticked = False
-
-	try:
-		am = subreddit.wiki['config/automoderator']
-		regex = r"^---[\n\r]+[\S ]+[\n\r]+[\S ]+[\n\r]+[\S ]+[\n\r]+[\S ]+megathread{}[\n\r]+".format(post_id)
-		regex = re.compile(regex, re.IGNORECASE|re.MULTILINE)
-
-		conf, reps = re.subn(regex, '', am.content_md)
-		reason = "End Megathread: {}".format(post_id)
-		am.edit(conf, reason=reason)
-		if reps > 0:
-			am_configured = True
-	except Exception as e:
-		log('exception', e)
-		am_configured = False
-
-	text = "Thread *{}* ended. / ID: `{}`\nAM Unconfigured: {}\nUnsticked: {}".format(title, post_id, am_configured, unsticked)
-	# log('info', response)
-	update(channel, text, response['ts'])
+def test(args):
+	id = args['id']
+	#t = threading.Timer(1, cmd_end_thread, args=[{"id" : id}, config['announce_channel']]).start()
 	return True
-

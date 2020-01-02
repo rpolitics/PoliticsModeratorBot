@@ -43,6 +43,14 @@ def process_modlog():
 			reply(config['report_channel'], out)
 			# log('info', out)
 
+		if modlog.details == 'new account mod posts':
+			cid = get_id(modlog.target_fullname)
+			comment = reddit.comment(id)
+			sid = get_id(comment.link_id)
+			submission = reddit.submission(id=sid)
+			out = "*[NEWACCOUNT]* New user (< 14 days) *<https://reddit.com/user/{}/overview|/u/{}>* <https://reddit.com{}|commented> on submission <https://redd.it/{}|{}>.".format(modlog.target_author, modlog.target_author, comment.permalink, sid, sid)
+			reply('#newaccounts', out)
+
 def start():
 	while True:
 		try:
