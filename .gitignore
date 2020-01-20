@@ -3,3 +3,5 @@ pycache/
 config.json
 *.log
 .DS_Store
+*.save*
+.idea/

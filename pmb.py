@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 from lib import *
 from modules import *
+
 from cpuinfo import get_cpu_info
 from io import StringIO
+from threading import Thread
+
+import base64
 import datetime
 import distro
 import functools
@@ -21,7 +25,7 @@ import slackclient
 import time
 import threading
 import websocket
-from threading import Thread
+import zlib
 
 UPTIME = datetime.datetime.now()
 
@@ -50,10 +54,13 @@ def get_config():
 def get_id(id):
 	return id.split('_')[1]
 
-def format_removal_reply(reason, author, permalink):
-	reply = config['removals']['header'] + "\n\n" + reason + "\n\n" + config['removals']['footer']
+def format_removal_reply(reason, author, permalink, kind):
+	if kind == 'submission':
+		reply = config['removals']['header'] + "\n\n" + reason + "\n\n" + config['removals']['footer']
+	elif kind == 'comment':
+		reply = config['removals']['comment_header'] + "\n\n" + reason + "\n\n" + config['removals']['comment_footer']
 	reply = reply.replace("{author}", str(author))
-	reply = reply.replace("{kind}", "submission")
+	reply = reply.replace("{kind}", kind)
 	reply = reply.replace("{subreddit}", config['subreddit'])
 	reply = reply.replace("{url}", permalink)
 	return reply
@@ -92,7 +99,7 @@ def log(level, msg):
 
 		if config['logging']['file']:
 			with open(config['logging']['file'], 'a+') as f:
-				f.write(line)
+				f.write(line + '\n')
 
 def get_args(message_text):
 	args = {}
@@ -149,7 +156,11 @@ def handle_command(command, message_text, channel):
 		return None
 
 	command = command.split()[0]
-	if command == 'mega':
+	if command == 'checkuser':
+		response = pushshift.checkuser(args, channel)
+	elif command == 'checkphrase':
+		response = pushshift.checkphrase(args, channel)
+	elif command == 'mega':
 		response = megabot.cmd_initiate_mega(args, channel)
 	elif command == 'discussion':
 		response = megabot.cmd_initiate_discussion(args, channel)
@@ -161,12 +172,12 @@ def handle_command(command, message_text, channel):
 		response = factoids.cmd_get_mentors()
 	elif command == 'query':
 		response = db.print_query_results(message_text.split('=', 1)[1][1:-1])
+	elif command == 'poll':
+		response = pollster.setup_poll(args, channel)
 	elif command == "sysinfo":
 		response = sysinfo.cmd_get_sysinfo(UPTIME)
 	elif command == 'help':
 		response = cmd_help()
-	elif command == 'test':
-		response = megabot.test(args)
 	else:
 		response = "Invalid command. Try again."
 

@@ -1,5 +1,6 @@
 distro
 google-api-python-client
+pandas
 peewee
 pendulum
 praw

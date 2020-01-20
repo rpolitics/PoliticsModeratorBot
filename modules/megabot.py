@@ -194,8 +194,3 @@ def cmd_initiate_discussion(args, channel):
 	t1 = threading.Timer(config['megabot']['expire'], cmd_end_thread, args=[{"id" : post.id}, config['announce_channel']]).start()
 
 	return True
-
-def test(args):
-	id = args['id']
-	#t = threading.Timer(1, cmd_end_thread, args=[{"id" : id}, config['announce_channel']]).start()
-	return True

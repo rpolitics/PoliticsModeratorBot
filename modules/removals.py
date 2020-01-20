@@ -19,7 +19,7 @@ def new_comment(submission, mod):
 		flair = submission.link_flair_text
 
 		if flair in config['removals']['reasons'].keys():
-			reply = format_removal_reply(config['removals']['reasons'][flair], submission.author, submission.permalink)
+			reply = format_removal_reply(config['removals']['reasons'][flair], submission.author, submission.permalink, "submission")
 
 			comment = submission.reply(reply)
 			comment.mod.distinguish()
