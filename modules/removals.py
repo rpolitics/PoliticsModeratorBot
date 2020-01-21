@@ -23,6 +23,7 @@ def new_comment(submission, mod):
 
 			comment = submission.reply(reply)
 			comment.mod.distinguish()
+			comment.mod.lock()
 
 			db.Removal.insert(submission_id=submission.id, comment_id=comment.id, moderator=mod, flair=flair, is_active=True).execute()
 

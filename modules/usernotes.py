@@ -28,14 +28,15 @@ def process_tags(last_run):
         if submission_id and comment_id:
             if ts > last_run:
                 if tag in config['removals']['tags'].keys():
-                    print('tag')
                     comment = reddit.comment(comment_id)
                     permalink = '/r/politics/comments/{}/-/{}/'.format(submission_id, comment_id)
 
                     reason = config['removals']['reasons'][config['removals']['tags'][tag]]
                     reply = format_removal_reply(reason, author, permalink, "comment")
 
-                    comment.reply(reply)
+                    comment = comment.reply(reply)
+                    comment.mod.distinguish()
+                    comment.mod.lock()
 
 def start():
     last_run = pendulum.now('UTC')
