@@ -14,7 +14,7 @@ def remove_submission(submissions):
 	submission.mod.remove()
 	submission.mod.flair(text=config['queueflood']['flair'])
 
-	reply = format_removal_reply(config['removals']['reasons'][config['queueflood']['flair']], submissions[0]['author'], 'https://redd.it/' + submissions[0]['id'])
+	reply = format_removal_reply(config['removals']['reasons'][config['queueflood']['flair']], submissions[0]['author'], 'https://redd.it/' + submissions[0]['id'], "submission")
 	flood_links = [str(x+1) + '. [' + pendulum.from_timestamp(submissions[x]['created_utc'].timestamp(), tz='local').to_datetime_string() + ' UTC] [' + submissions[x]['title'] + '](https://redd.it/' + submissions[x]['id'] + ')' for x in range(len(submissions))]
 	reply = reply.replace("{flood_links}", '\n'.join(flood_links))
 
