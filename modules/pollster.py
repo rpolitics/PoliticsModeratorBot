@@ -86,7 +86,7 @@ def process_polls(polls, candidates):
     return data
 
 def generate_table(polls, candidates):
-    table = "Poll|Date|Type|{}\n".format('|'.join(candidates))
+    table = "Poll|Date|Type|{}\n".format('|'.join(sorted(candidates)))
     table += ":--|:--|:--|:--{}\n".format('|:--' * len(candidates))
 
     for poll in polls.items():
