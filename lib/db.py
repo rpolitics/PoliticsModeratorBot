@@ -14,10 +14,9 @@ class BaseModel(Model):
 	class Meta:
 		database = mysql_db
 
-
 class BotLog(BaseModel):
 	class Meta:
-		 table_name = 'botlog'
+		table_name = 'botlog'
 
 	id = CharField(max_length=10, null=False)
 	module = CharField(max_length=15, null=False)

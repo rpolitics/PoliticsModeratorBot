@@ -10,7 +10,7 @@ config = get_config()
 reddit = praw.Reddit(config['bot_name'], user_agent=config['user_agent'])
 subreddit = reddit.subreddit(config['subreddit'])
 
-dateparse = lambda x: pandas.datetime.strptime(x, '%m/%d/%y %H:%M')
+dateparse = lambda x: datetime.datetime.strptime(x, '%m/%d/%y %H:%M')
 
 df = pandas.read_csv('https://projects.fivethirtyeight.com/polls-page/president_primary_polls.csv', usecols=['poll_id', 'question_id', 'state', 'pollster', 'created_at', 'party', 'answer', 'pct', 'url'], parse_dates=['created_at'], date_parser=dateparse)
 df['id'] = df.poll_id + df.question_id
@@ -57,7 +57,7 @@ def process_polls(polls, candidates):
 
         i = 0
         for idx, row in poll.iterrows():
-            created_at = pandas.to_datetime(row.created_at).strftime('%-m-%-d')
+            created_at = (row.created_at).strftime('%-m-%-d')
             data[id]['state'] = row.state if not pandas.isnull(row.state) else 'National'
             data[id]['created_at'] = created_at
             data[id]['pollster'] = row.pollster.split('/')[0]

@@ -10,6 +10,8 @@ def process_modlog():
 	modlogs = praw.models.util.stream_generator(functools.partial(subreddit.mod.log), attribute_name='id', skip_existing=True)
 	for modlog in modlogs:
 		dt = pendulum.from_timestamp(modlog.created_utc, tz='UTC')
+		dt = dt.strftime("%Y-%m-%d %H:%M:%S")
+
 		db.ModAction.insert(id=modlog.id,
 					created_utc=dt,
 					moderator=modlog._mod,

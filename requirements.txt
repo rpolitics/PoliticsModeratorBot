@@ -5,6 +5,7 @@ peewee
 pendulum
 praw
 prettytable
+psaw
 psutil
 publicsuffixlist
 pymysql

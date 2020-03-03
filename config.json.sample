@@ -5,7 +5,7 @@
 	"user_agent" : "",
 	"logging" : {
 		"level" : "",
-		"channel" : "",
+		"channel" : ,
 		"file" : ""
 	},
 	"announce_channel" : "",
@@ -15,13 +15,19 @@
 		"user" : "",
 		"password" : "",
 		"host" : "",
-		"port" : 
+		"port" :
 	},
 	"domain_match" : {
-		"ignore" : []
+		"ignore" : [
+			"",
+			""
+		]
 	},
 	"megabot" : {
 		"expire" : ,
+		"initial_sort" : "",
+		"final_sort" : "",
+		"sort_delay" : ,
 		"mega_flair" : "",
 		"discussion_flair" : ""
 	},
@@ -48,8 +54,10 @@
 	},
 	"removals" : {
 		"exemptmods" : [],
+		"tags" : {},
 		"header" : "",
 		"footer" : "",
+		"comment_footer" : "",
 		"reasons" : {}
 	}
 }

@@ -34,9 +34,13 @@ def process_tags(last_run):
                     reason = config['removals']['reasons'][config['removals']['tags'][tag]]
                     reply = format_removal_reply(reason, author, permalink, "comment")
 
-                    comment = comment.reply(reply)
-                    comment.mod.distinguish()
-                    comment.mod.lock()
+                    try:
+                        comment = comment.reply(reply)
+                        comment.mod.distinguish()
+                        comment.mod.lock()
+                    except praw.exceptions.APIException as e:
+                        if e.error_type == 'DELETED_COMMENT':
+                            continue
 
 def start():
     last_run = pendulum.now('UTC')

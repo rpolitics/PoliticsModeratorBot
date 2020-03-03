@@ -11,7 +11,10 @@ def process_submissions():
 	for submission in submissions:
 		if not submission.is_self:
 			post_dt = pendulum.from_timestamp(submission.created_utc, tz='UTC')
+			post_dt = post_dt.strftime("%Y-%m-%d %H:%M:%S")
 			author_dt = pendulum.from_timestamp(submission.author.created_utc, tz='UTC')
+			author_dt = author_dt.strftime("%Y-%m-%d %H:%M:%S")
+
 			db.Submission.insert(id=submission.id,
 								created_utc=post_dt,
 								author=submission.author.name,
