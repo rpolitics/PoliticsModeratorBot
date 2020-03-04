@@ -6,7 +6,7 @@ from prettytable import PrettyTable, from_db_cursor
 with open('config.json', 'r') as f:
 	config = json.load(f)['database']
 
-mysql_db = MySQLDatabase(config['database'], user=config['user'], password=config['password'], host=config['host'], port=config['port'])
+mysql_db = MySQLDatabase(config['database'], user=config['user'], password=config['password'], host=config['host'], port=config['port'], charset=config['charset'])
 
 mysql_db.connect()
 

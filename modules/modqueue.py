@@ -1,5 +1,13 @@
 from pmb import *
 
+import warnings
+import pymysql
+warnings.filterwarnings(
+  action="ignore",
+  message=".*Duplicate entry.*",
+  category=pymysql.Warning
+)
+
 config = get_config()
 
 # PRAW
