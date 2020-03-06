@@ -50,7 +50,7 @@ class ModAction(BaseModel):
 	moderator = CharField(max_length=20, null=False)
 	action = CharField(max_length=50, null=False)
 	details = CharField(max_length=300, null=True)
-	target_fullname = CharField(max_length=10, null=True)
+	target_fullname = CharField(max_length=11, null=True)
 	target_author = CharField(max_length=20, null=True)
 	target_title = CharField(max_length=300, null=True)
 
