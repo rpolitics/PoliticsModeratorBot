@@ -32,7 +32,7 @@ def monitor_reports():
 			reason = report[0]
 			if reason:
 				author = report[1]
-				db.Report.insert(id=id, author=author, reason=reason, is_ignored=item.ignore_reports).on_conflict_ignore(ignore=True).execute()
+				result = db.Report.insert(id=id, author=author, reason=reason, is_ignored=item.ignore_reports).on_conflict_ignore(ignore=True).execute()
 
 		ts = pendulum.now().to_datetime_string()
 
