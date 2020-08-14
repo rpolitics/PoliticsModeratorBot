@@ -72,6 +72,9 @@ def reply(channel, response):
 def update(channel, response, ts):
 	return slack_client.api_call("chat.update", channel=channel, text=response, ts=ts)
 
+def upload(channel, file, title):
+	return slack_client.api_call("files.upload", channels=channel, file=file, title=title)
+
 def log(level, msg):
 	try:
 		clevel = config['logging']['level']
@@ -104,7 +107,7 @@ def log(level, msg):
 
 def get_args(message_text):
 	args = {}
-	message_text = message_text[len(message_text.split()[0]):].replace('“','"').replace('”','"')
+	message_text = message_text[len(message_text.split()[0]):].replace('“','"').replace('”','"').replace("&amp;", "&")
 	regex = re.compile(r"(?P<key>[^\s]*?)=(?P<value>(?:(?!([^\s]*?)=).)*)", re.DOTALL)
 	for (k, v, e) in re.findall(regex, message_text):
 		v = v.strip()

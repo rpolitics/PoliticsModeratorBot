@@ -12,15 +12,34 @@ subreddit = reddit.subreddit(config['subreddit'])
 
 dateparse = lambda x: datetime.datetime.strptime(x, '%m/%d/%y %H:%M')
 
-def create_file(channel, table):
-    f = open("polls.txt", "w")
-    f.write(table)
-    f.close()
+df = pandas.read_csv('https://projects.fivethirtyeight.com/polls-page/president_primary_polls.csv', usecols=['poll_id', 'question_id', 'state', 'pollster', 'created_at', 'party', 'answer', 'pct', 'url'], parse_dates=['created_at'], date_parser=dateparse)
+df['id'] = df.poll_id + df.question_id
 
-    f = open("polls.txt", "r")
-    upload(channel, f, "polls")
-    f.close()
-    os.remove("polls.txt")
+start_date = (datetime.datetime.now() + datetime.timedelta(-14)).strftime('%m/%d/%y')
+
+all_polls = df.loc[df.created_at >= start_date]
+
+polls = {}
+
+def create_post(channel, title, beforetext, aftertext, table):
+    msg = "Initiating poll..."
+    response = reply(channel, msg)
+
+    body = '{}\n\n{}\n\n{}'.format(beforetext, table, aftertext)
+
+    response = update(channel, "Submitting post...", response['ts'])
+    post = subreddit.submit(title, selftext=body, send_replies=False)
+    response = update(channel, "Approving post...", response['ts'])
+    post.mod.approve()
+    response = update(channel, "Distinguishing post...", response['ts'])
+    post.mod.distinguish(how='yes')
+    response = update(channel, "Stickying post...", response['ts'])
+    post.mod.sticky(state=True)
+    response = update(channel, "Ignoring reports...", response['ts'])
+    post.mod.ignore_reports()
+
+    msg = "Polling thread *{}* initiated: https://reddit.com{}".format(title, post.permalink)
+    update(channel, msg, response['ts'])
 
     return True
 
@@ -78,18 +97,10 @@ def generate_table(polls, candidates):
 
     return table
 
-def generate_polls(candidates, days):
-    df = pandas.read_csv('https://projects.fivethirtyeight.com/polls-page/president_polls.csv', usecols=['poll_id', 'question_id', 'state', 'pollster', 'created_at', 'answer', 'pct', 'url'], parse_dates=['created_at'], date_parser=dateparse)
-    df['id'] = df.poll_id + df.question_id
+def generate_poll(party, candidates):
+    polls[party] = all_polls.loc[all_polls['party'] == party].sort_values(by=['created_at'], ascending=False)
 
-    start_date = (datetime.datetime.now() + datetime.timedelta(-days)).strftime('%m/%d/%y')
-
-    all_polls = df.loc[df.created_at >= start_date]
-
-    polls = {}
-    polls = all_polls.sort_values(by=['created_at'], ascending=False)
-
-    data = process_polls(polls, candidates)
+    data = process_polls(polls[party], candidates)
 
     table = generate_table(data, candidates)
 
@@ -97,19 +108,30 @@ def generate_polls(candidates, days):
 
 def setup_poll(args, channel):
     try:
+        title = args['title']
+    except Exception as e:
+        log('warn', e)
+        return "No `title` given."
+
+    try:
+        beforetext = args['beforetext']
+        aftertext = args['aftertext']
+    except Exception as e:
+        log('warn', e)
+        return "No `beforetext` and `aftertext` given."
+
+    try:
+        party = args['party']
+    except Exception as e:
+        log('warn', e)
+        return "No `party` given."
+
+    try:
         candidates = args['candidates'].split(',')
     except Exception as e:
         log('warn', e)
         return "No `candidates` given."
 
-    try:
-        days = int(args['days'])
-    except Exception as e:
-        log('warn', e)
-        return "You must enter a valid number of days from today to obtain polls."
+    table = generate_poll('DEM', candidates)
 
-    table = generate_polls(candidates, days)
-
-    create_file(channel, table)
-
-    return True
+    create_post(channel, title, beforetext, aftertext, table)
